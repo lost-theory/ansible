@@ -1,20 +1,14 @@
-from ansible.module_common import REPLACER
+import os
 
-if __name__ == "__main__":
-    import sys
-    sys.argv.pop(0)
-    if not sys.argv:
-        print "missing library command name"
-        raise SystemExit(1)
+REPLACER = "#<<INCLUDE_ANSIBLE_MODULE_COMMON>>"
 
-    name = sys.argv[0]
+def transform(name):
     lib = open("library/%s" % name).read()
     if (REPLACER not in lib
             or "\nmain()" not in lib
             or "def main():" not in lib
             or "AnsibleModule(" not in lib):
-        print "this is a strange file indeed"
-        raise SystemExit(1)
+        raise ValueError("%r is a strange file indeed" % lib)
 
     lib = lib.replace(REPLACER, "\nfrom newcommon import *\n") #replace boilerplate code with our new common code
     lib = lib.replace("\nmain()", "") #do not run the module
@@ -26,4 +20,30 @@ if __name__ == "__main__":
     open(new, 'w').write(lib)
     print "wrote %r" % new
 
-    from newlibrary import user
+def transform_all():
+    libs = sorted(os.listdir("./library/"))
+    stats = dict(converted=0, skipped=0)
+    for l in libs:
+        try:
+            transform(l)
+            stats['converted'] += 1
+        except ValueError, e:
+            if "strange file indeed" in repr(e):
+                print "skipped %r because it looks strange" % l
+                stats['skipped'] += 1
+                continue
+            raise
+    print "done: %r" % stats
+
+if __name__ == "__main__":
+    import sys
+    sys.argv.pop(0)
+    if not sys.argv:
+        print "missing library command name or 'all'"
+        raise SystemExit(1)
+    name = sys.argv[0]
+
+    if name == "all":
+        transform_all()
+    else:
+        transform(name)
