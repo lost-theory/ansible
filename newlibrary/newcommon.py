@@ -1,14 +1,3 @@
-BOOLEANS_TRUE = ['yes', 'on', '1', 'true', 1]
-BOOLEANS_FALSE = ['no', 'off', '0', 'false', 0]
-BOOLEANS = BOOLEANS_TRUE + BOOLEANS_FALSE
-
-# ansible modules can be written in any language.  To simplify
-# development of Python modules, the functions available here
-# can be inserted in any module source automatically by including
-# #<<INCLUDE_ANSIBLE_MODULE_COMMON>> on a blank line by itself inside
-# of an ansible module. The source of this common code lives
-# in lib/ansible/module_common.py
-
 import os
 import re
 import shlex
@@ -50,11 +39,20 @@ except ImportError:
     from md5 import md5 as _md5
 
 try:
-  from systemd import journal
-  has_journal = True
+    from systemd import journal
+    has_journal = True
 except ImportError:
-  import syslog
-  has_journal = False
+    import syslog
+    has_journal = False
+
+class AnsibleError(Exception):
+    '''The base Ansible exception from which all others should subclass.'''
+
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg
 
 FILE_COMMON_ARGUMENTS=dict(
     src = dict(),
@@ -70,6 +68,10 @@ FILE_COMMON_ARGUMENTS=dict(
     backup = dict(),
     force = dict(),
 )
+
+BOOLEANS_TRUE = ['yes', 'on', '1', 'true', 1]
+BOOLEANS_FALSE = ['no', 'off', '0', 'false', 0]
+BOOLEANS = BOOLEANS_TRUE + BOOLEANS_FALSE
 
 def get_platform():
     ''' what's the platform?  example: Linux is a platform. '''
@@ -119,27 +121,24 @@ class AnsibleModule(object):
 
     def __init__(self, argument_spec, bypass_checks=False, no_log=False,
         check_invalid_arguments=True, mutually_exclusive=None, required_together=None,
-        required_one_of=None, add_file_common_args=False, supports_check_mode=False):
+        required_one_of=None, add_file_common_args=False, supports_check_mode=False,
+        params=None):
 
         '''
         common code for quickly building an ansible module in Python
-        (although you can write modules in anything that can return JSON)
-        see library/* for examples
         '''
 
         self.argument_spec = argument_spec
         self.supports_check_mode = supports_check_mode
         self.check_mode = False
         
+        self.params = params or {}
         self.aliases = {}
         
         if add_file_common_args:
             for k, v in FILE_COMMON_ARGUMENTS.iteritems():
                 if k not in self.argument_spec:
                     self.argument_spec[k] = v
-
-        os.environ['LANG'] = MODULE_LANG
-        (self.params, self.args) = self._load_params()
 
         self._legal_inputs = [ 'CHECKMODE' ]
         
@@ -588,21 +587,6 @@ class AnsibleModule(object):
                  if k not in self.params:
                      self.params[k] = default
 
-    def _load_params(self):
-        ''' read the input and return a dictionary and the arguments string '''
-        args = MODULE_ARGS
-        items   = shlex.split(args)
-        params = {}
-        for x in items:
-            try:
-                (k, v) = x.split("=",1)
-            except Exception, e:
-                self.fail_json(msg="this module requires key=value arguments (%s)" % items)
-            params[k] = v
-        params2 = json.loads(MODULE_COMPLEX_ARGS)
-        params2.update(params)
-        return (params2, args)
-
     def _log_invocation(self):
         ''' log that ansible ran the module '''
         # TODO: generalize a separate log function and make log_invocation use it
@@ -693,16 +677,15 @@ class AnsibleModule(object):
         self.add_path_info(kwargs)
         if not kwargs.has_key('changed'):
             kwargs['changed'] = False
-        print self.jsonify(kwargs)
-        sys.exit(0)
+        return kwargs
 
     def fail_json(self, **kwargs):
         ''' return from the module, with an error message '''
         self.add_path_info(kwargs)
         assert 'msg' in kwargs, "implementation error -- msg to explain the error is required"
         kwargs['failed'] = True
-        print self.jsonify(kwargs)
-        sys.exit(1)
+        msg = kwargs.pop('msg')
+        raise AnsibleError("%s (%r)" % (msg.strip(), kwargs))
 
     def is_executable(self, path):
         '''is the given path executable?'''
