@@ -246,7 +246,7 @@ class Service(object):
         elif self.state == "restarted":
             self.changed = True
         if self.module.check_mode and self.changed:
-            self.return module.exit_json(changed=True, msg='service state changed')
+            return self.module.exit_json(changed=True, msg='service state changed')
 
     def modify_service_state(self):
 
@@ -263,7 +263,7 @@ class Service(object):
                 self.action = "restart"
 
             if self.module.check_mode:
-                self.return module.exit_json(changed=True, msg='changing service state')
+                return self.module.exit_json(changed=True, msg='changing service state')
 
             return self.service_control()
 
@@ -313,7 +313,7 @@ class Service(object):
         if changed is True:
 
             if self.module.check_mode:
-                self.return module.exit_json(changed=True, msg="changing service enablement")
+                return self.module.exit_json(changed=True, msg="changing service enablement")
 
             # Create a temporary file next to the current rc.conf (so we stay on the same filesystem).
             # This way the replacement operation is atomic.
@@ -518,7 +518,7 @@ class LinuxService(Service):
         self.changed = True
 
         if self.module.check_mode and self.changed:
-            self.return module.exit_json(changed=True)
+            return self.module.exit_json(changed=True)
 
         return self.execute_command("%s %s %s" % args)
 

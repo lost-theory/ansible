@@ -14,7 +14,12 @@ def transform(name):
     lib = lib.replace("\nmain()", "") #do not run the module
     lib = lib.replace("def main():", "def main(**params):") #replace main()'s signature
     lib = lib.replace("AnsibleModule(", "AnsibleModule(params=params,") #pass in params from main()'s new signature
-    lib = lib.replace("module.exit_json", "return module.exit_json") #return output from main()
+
+    #send return values instead of relying on *_json functions to write to stdout / call sys.exit
+    lib = lib.replace("self.module.exit_json", "__rsmej__")
+    lib = lib.replace("module.exit_json", "return module.exit_json")
+    lib = lib.replace("m.exit_json", "return m.exit_json")
+    lib = lib.replace("__rsmej__", "return self.module.exit_json")
 
     new = "newlibrary/%s.py" % name
     open(new, 'w').write(lib)

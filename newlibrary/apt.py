@@ -151,15 +151,15 @@ def install(m, pkgspec, cache, upgrade=False, default_release=None, install_reco
             cmd += " --no-install-recommends"
 
         if m.check_mode:
-            m.exit_json(changed=True)
+            return m.exit_json(changed=True)
 
         rc, out, err = m.run_command(cmd)
         if rc:
             m.fail_json(msg="'apt-get install %s' failed: %s" % (packages, err))
         else:
-            m.exit_json(changed=True)
+            return m.exit_json(changed=True)
     else:
-        m.exit_json(changed=False)
+        return m.exit_json(changed=False)
 
 def remove(m, pkgspec, cache, purge=False):
     packages = ""
@@ -170,7 +170,7 @@ def remove(m, pkgspec, cache, purge=False):
             packages += "'%s' " % package
 
     if len(packages) == 0:
-        m.exit_json(changed=False)
+        return m.exit_json(changed=False)
     else:
         purge = ''
         if purge:
@@ -178,12 +178,12 @@ def remove(m, pkgspec, cache, purge=False):
         cmd = "%s -q -y %s remove %s" % (APT, purge,packages)
 
         if m.check_mode:
-            m.exit_json(changed=True)
+            return m.exit_json(changed=True)
 
         rc, out, err = m.run_command(cmd)
         if rc:
             m.fail_json(msg="'apt-get remove %s' failed: %s" % (packages, err))
-        m.exit_json(changed=True)
+        return m.exit_json(changed=True)
 
 def upgrade(m, mode="yes"):
     upgrade_command = 'upgrade'
@@ -194,8 +194,8 @@ def upgrade(m, mode="yes"):
     if rc:
         m.fail_json(msg="'apt-get %s' failed: %s" % (upgrade_command, err))
     if "0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded." in out :
-        m.exit_json(changed=False)
-    m.exit_json(changed=True)
+        return m.exit_json(changed=False)
+    return m.exit_json(changed=True)
 
 def main(**params):
     module = AnsibleModule(params=params,

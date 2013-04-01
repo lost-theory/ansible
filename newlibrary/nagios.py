@@ -858,7 +858,7 @@ class Nagios(object):
             self.module.fail_json(msg="unknown action specified: '%s'" % \
                                       self.action)
 
-        self.return module.exit_json(nagios_commands=self.command_results,
+        return self.module.exit_json(nagios_commands=self.command_results,
                               changed=True)
 
 ######################################################################
