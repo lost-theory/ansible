@@ -74,7 +74,7 @@ try:
     import boto 
 except ImportError:
     print "failed=True msg='boto required for this module'"
-    sys.exit(1)
+    raise Exception('was going to call sys.exit(1)') #XXX
 
 def main(**params):
     module = AnsibleModule(params=params,
@@ -173,7 +173,7 @@ def main(**params):
         "volume_id": volume.id,
         "device": device_name
     })
-    sys.exit(0)
+    print 'OK, was going to call sys.exit(0)' #XXX
 
 # this is magic, see lib/ansible/module_common.py
 

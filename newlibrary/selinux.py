@@ -60,7 +60,7 @@ try:
     import selinux
 except ImportError:
     print json.dumps(failed=True, msg='python-selinux required for this module')
-    sys.exit(1)
+    raise Exception('was going to call sys.exit(1)') #XXX
 
 # getter subroutines
 def get_config_state(configfile):

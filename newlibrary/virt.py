@@ -65,7 +65,7 @@ try:
     import libvirt
 except ImportError:
     print "failed=True msg='libvirt python module unavailable'"
-    sys.exit(1)
+    raise Exception('was going to call sys.exit(1)') #XXX
 
 ALL_COMMANDS = []
 VM_COMMANDS = ['create','status', 'start', 'stop', 'pause', 'unpause',

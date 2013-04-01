@@ -17,9 +17,17 @@ def transform(name):
 
     #send return values instead of relying on *_json functions to write to stdout / call sys.exit
     lib = lib.replace("self.module.exit_json", "__rsmej__")
+    lib = lib.replace("return module.exit_json", "__rmej__")
     lib = lib.replace("module.exit_json", "return module.exit_json")
     lib = lib.replace("m.exit_json", "return m.exit_json")
     lib = lib.replace("__rsmej__", "return self.module.exit_json")
+    lib = lib.replace("__rmej__", "return module.exit_json")
+
+    #replace sys.exit(1) with an exception that can be caught
+    lib = lib.replace("sys.exit(1)", "raise Exception('was going to call sys.exit(1)') #XXX")
+
+    #replace sys.exit(0) calls with print statement
+    lib = lib.replace("sys.exit(0)", "print 'OK, was going to call sys.exit(0)' #XXX")
 
     new = "newlibrary/%s.py" % name
     open(new, 'w').write(lib)

@@ -117,7 +117,7 @@ def daemonize_self(module, password, port, minutes):
             return module.exit_json(msg="daemonzed fireball on port %s for %s minutes" % (port, minutes))
     except OSError, e:
         log("fork #1 failed: %d (%s)" % (e.errno, e.strerror))
-        sys.exit(1)
+        raise Exception('was going to call sys.exit(1)') #XXX
 
     # decouple from parent environment
     os.chdir("/")
@@ -133,10 +133,10 @@ def daemonize_self(module, password, port, minutes):
             pid_file.write("%s" % pid)
             pid_file.close()
             log("pidfile written")
-            sys.exit(0)
+            print 'OK, was going to call sys.exit(0)' #XXX
     except OSError, e:
         log("fork #2 failed: %d (%s)" % (e.errno, e.strerror))
-        sys.exit(1)
+        raise Exception('was going to call sys.exit(1)') #XXX
 
     dev_null = file('/dev/null','rw')
     os.dup2(dev_null.fileno(), sys.stdin.fileno())
@@ -247,7 +247,7 @@ def daemonize(module, password, port, minutes):
     except Exception, e:
         tb = traceback.format_exc()
         log("exception caught, exiting fireball mode: %s\n%s" % (e, tb))
-        sys.exit(0)
+        print 'OK, was going to call sys.exit(0)' #XXX
 
 def main(**params):
 

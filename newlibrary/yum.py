@@ -530,7 +530,7 @@ def latest(module, items, repoq, yum_basecmd, conf_file, en_repos, dis_repos):
         cmd = yum_basecmd + [basecmd, pkg]
 
         if module.check_mode:
-            return return module.exit_json(changed=True)
+            return module.exit_json(changed=True)
 
         rc, out, err = module.run_command(cmd)
 

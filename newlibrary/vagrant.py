@@ -110,7 +110,7 @@ try:
     import vagrant
 except ImportError:
     print "failed=True msg='python-vagrant required for this module'"
-    sys.exit(1)
+    raise Exception('was going to call sys.exit(1)') #XXX
 
 class VagrantWrapper(object):
 
@@ -133,7 +133,7 @@ class VagrantWrapper(object):
                 fcntl.flock(self.lock, fcntl.LOCK_EX)
             except:
                 print "failed=True msg='Could not get a lock for using vagrant. Install python module \"lockfile\" to use vagrant on non-POSIX filesytems.'"
-                sys.exit(1)
+                raise Exception('was going to call sys.exit(1)') #XXX
             
         # Initialize vagrant and state files
         self.vg = vagrant.Vagrant()

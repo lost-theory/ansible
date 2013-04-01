@@ -60,7 +60,7 @@ try:
     import boto
 except ImportError:
     print "failed=True msg='boto required for this module'"
-    sys.exit(1)
+    raise Exception('was going to call sys.exit(1)') #XXX
 
 def main(**params):
     module = AnsibleModule(params=params,
@@ -128,7 +128,7 @@ def main(**params):
         if not os.path.exists(path):
             failed = True
             module.fail_json(msg="Source %s cannot be found" % (path), failed=failed)
-            sys.exit(0)
+            print 'OK, was going to call sys.exit(0)' #XXX
 
     # Default to setting the key to the same as the filename if not downloading. Adding custom key would be trivial.
     key_name = os.path.basename(path)
@@ -149,7 +149,7 @@ def main(**params):
             exists = True
             changed = False
             return module.exit_json(msg="Bucket and key already exist", changed=changed)
-            sys.exit(0)    
+            print 'OK, was going to call sys.exit(0)' #XXX    
 
    # If bucket exists, there cannot be a key within, lets create it ...
     if state == 'present':
@@ -171,7 +171,7 @@ def main(**params):
                 key.set_contents_from_filename(path)
                 url = key.generate_url(expiry)
                 return module.exit_json(msg="Put operation complete", url=url, changed=True)
-                sys.exit(0)
+                print 'OK, was going to call sys.exit(0)' #XXX
             except s3.provider.storage_copy_error, e:
                 module.fail_json(msg= str(e))
 
@@ -184,7 +184,7 @@ def main(**params):
                     s3.delete_bucket(bucket)
                     changed = True
                     return module.exit_json(msg="Bucket and key removed.", changed=changed)
-                    sys.exit(0)
+                    print 'OK, was going to call sys.exit(0)' #XXX
             except s3.provider.storage_response_error, e:
                 module.fail_json(msg= str(e))
         else:
@@ -200,11 +200,11 @@ def main(**params):
     #                getkey.get_contents_to_filename(path)
     #                url = getkey.generate_url(expiry)
     #                return module.exit_json(msg="GET operation complete", url=url, changed=True)
-    #                sys.exit(0)
+    #                print 'OK, was going to call sys.exit(0)' #XXX
     #            except s3.provider.storage_copy_error, e:
     #                module.fail_json(msg= str(e))
     
-    sys.exit(0)
+    print 'OK, was going to call sys.exit(0)' #XXX
 
 # this is magic, see lib/ansible/module_common.py
 

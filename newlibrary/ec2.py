@@ -149,7 +149,7 @@ try:
     import boto
 except ImportError:
     print "failed=True msg='boto required for this module'"
-    sys.exit(1)
+    raise Exception('was going to call sys.exit(1)') #XXX
 
 def main(**params):
     module = AnsibleModule(params=params,

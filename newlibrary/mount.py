@@ -306,7 +306,7 @@ def main(**params):
         return module.exit_json(changed=changed, **args)
 
     module.fail_json(msg='Unexpected position reached')
-    sys.exit(0)
+    print 'OK, was going to call sys.exit(0)' #XXX
 
 # this is magic, see lib/ansible/module_common.py
 

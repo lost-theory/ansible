@@ -311,7 +311,7 @@ def main(**params):
     # end
     sysctl_args = sysctl_args_collapse(**sysctl_args)
     return module.exit_json(changed=changed, **sysctl_args)
-    sys.exit(0)
+    print 'OK, was going to call sys.exit(0)' #XXX
 
 # this is magic, see lib/ansible/module_common.py
 
