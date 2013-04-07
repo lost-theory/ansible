@@ -114,7 +114,7 @@ def daemonize_self(module, password, port, minutes):
         if pid > 0:
             log("exiting pid %s" % pid)
             # exit first parent
-            return module.exit_json(msg="daemonzed fireball on port %s for %s minutes" % (port, minutes))
+            return module.exit_json(msg="daemonized fireball on port %s for %s minutes" % (port, minutes))
     except OSError, e:
         log("fork #1 failed: %d (%s)" % (e.errno, e.strerror))
         raise Exception('was going to call sys.exit(1)') #XXX

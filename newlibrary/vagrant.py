@@ -19,17 +19,19 @@ DOCUMENTATION = '''
 module: vagrant
 short_description: create a local instance via vagrant
 description:
-     - creates VM instances via vagrant and optionally waits for it to be 'running'. This module has a dependency on python-vagrant.
-version_added: "100.0"
+  - creates VM instances via vagrant and optionally waits for it to be 'running'.
+version_added: "1.1"
 options:
   state:
-    description: Should the VMs be "present" or "absent."
+    description:
+      - Should the VMs be "present" or "absent."
   cmd:
     description:
-      - vagrant subcommand to execute. Can be "up," "status," "config," "ssh," "halt," "destroy" or "clear." 
+      - vagrant subcommand to execute.
     required: false
     default: null
-    aliases: ['command'] 
+    aliases: ['command']
+    choices: [ "up", "status", "config", "ssh", "halt", "destroy", "clear" ]
   box_name:
     description:
       - vagrant boxed image to start
@@ -61,13 +63,13 @@ options:
     aliases: []
   memory:
     description:
-      - memory in MB    
+      - memory in MB
     required: False
-    
+
 examples:
    - code: 'local_action: vagrant cmd=up box_name=lucid32 vm_name=webserver'
-     description: 
-requirements: [ "vagrant" ]
+     description:
+requirements: [ "vagrant", "python-vagrant" ]
 author: Rob Parrott
 '''
 
