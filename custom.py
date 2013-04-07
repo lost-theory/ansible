@@ -29,7 +29,12 @@ def transform(name):
     #replace sys.exit(0) calls with print statement
     lib = lib.replace("sys.exit(0)", "print 'OK, was going to call sys.exit(0)' #XXX")
 
-    new = "newlibrary/%s.py" % name
+    #rename selinux module since it confuses the HAVE_SELINUX check
+    newname = name
+    if newname == "selinux":
+        newname = "selinux_module"
+
+    new = "newlibrary/%s.py" % newname
     open(new, 'w').write(lib)
     print "wrote %r" % new
 
